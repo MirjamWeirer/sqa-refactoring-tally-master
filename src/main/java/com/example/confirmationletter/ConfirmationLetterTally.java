@@ -26,7 +26,7 @@ public class ConfirmationLetterTally {
     ) {
         Map<String, BigDecimal> result = calculateRetrieveAmounts(records, faultyRecords,
                 client, faultyAccountNumberRecordList, sansDuplicateFaultRecordsList);
-        result.put("CreditBatchTotal", creditBatchTotal(batchTotals, client));
+        result.put("CreditBatchTotal", creditBatchTotal(batchTotals, client.getAmountDivider()));
         result.put("DebitBatchTotal", debitBatchTotal(batchTotals, client));
         return result;
     }
@@ -391,20 +391,16 @@ public class ConfirmationLetterTally {
             retrievedAmounts.put(Constants.CURRENCY_EURO, recordAmountEUR);
             retrievedAmounts.put(Constants.CURRENCY_FL, recordAmountUSD);
             retrievedAmounts.put(Constants.CURRENCY_FL, recordAmountFL);
-
         }
-
         return retrievedAmounts;
     }
 
-     BigDecimal creditBatchTotal(Map<Integer, BatchTotal> batchTotals,
-                                        Client client) {
+     BigDecimal creditBatchTotal(Map<Integer, BatchTotal> batchTotals, BigDecimal amountDivider) {
         BigDecimal sum =  BigDecimal.ZERO;
          for (BatchTotal total : batchTotals.values()) {
              sum = sum.add(total.getCreditValue());
          }
-        BigDecimal divider = new BigDecimal(client.getAmountDivider());
-        sum = sum.divide(divider);
+        sum = sum.divide(amountDivider);
         return sum;
     }
 
@@ -416,7 +412,7 @@ public class ConfirmationLetterTally {
             BatchTotal total = itr.next();
             sum = sum + total.getCreditCounterValueForDebit().doubleValue();
         }
-        Double d = sum / new Double(client.getAmountDivider());
+        Double d = sum / client.getAmountDivider().doubleValue();
         return new BigDecimal(d);
     }
 }
