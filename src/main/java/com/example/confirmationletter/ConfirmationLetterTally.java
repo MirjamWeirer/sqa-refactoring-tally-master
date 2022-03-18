@@ -13,7 +13,7 @@ import java.util.*;
 
 public class ConfirmationLetterTally {
 
-    // private static Log logger = LogFactory.getLog(ConfirmationLetterGenerator.class);
+
     @SuppressWarnings("unused")
     private static final String COLLECTIVE = "collectief";
 
@@ -35,18 +35,6 @@ public class ConfirmationLetterTally {
     ) {
         Map<String, BigDecimal> result = calculateRetrieveAmounts(records, faultyRecords,
                 client, faultyAccountNumberRecordList, sansDuplicateFaultRecordsList);
-//        List<AmountAndRecordsPerBank> aarpbList = amountAndRecords(records, Constants.DEBITING);
-//        BigDecimal debiting = BigDecimal.ZERO;
-//        for (AmountAndRecordsPerBank aarpb: aarpbList) {
-//            debiting = debiting.add(aarpb.getAmount());
-//        }
-//        result.put("DebitingAmount", debiting);
-//        aarpbList = amountAndRecords(records, Constants.CREDITING);
-//        BigDecimal crediting = BigDecimal.ZERO;
-//        for (AmountAndRecordsPerBank aarpb: aarpbList) {
-//            crediting = crediting.add(aarpb.getAmount());
-//        }
-//        result.put("CreditingAmount", crediting);
         result.put("CreditBatchTotal", creditBatchTotal(batchTotals, client));
         result.put("DebitBatchTotal", debitBatchTotal(batchTotals, client));
         return result;
@@ -66,8 +54,6 @@ public class ConfirmationLetterTally {
         BigDecimal faultyAccRecordAmountDebitEUR = new BigDecimal(0);
 
         for (TempRecord faultyAccountNumberRecord : faultyAccountNumberRecordList) {
-            // // logger.debug("faultyAccountNumberRecord: "+
-            // faultyAccountNumberRecord);
             // FL
             if (StringUtils.isBlank(faultyAccountNumberRecord.getSign())) {
                 faultyAccountNumberRecord.setSign(client.getCreditDebit());
@@ -188,7 +174,6 @@ public class ConfirmationLetterTally {
                             Constants.DEBIT)) {
                         recordAmountFL = record.getAmount().add(
                                 recordAmountFL);
-                        // system.out.println("recordAmountFL: ["+ recordAmountFL + "]");
 
                     }
                     if (record.getCurrency().getCode().equals(
@@ -197,7 +182,6 @@ public class ConfirmationLetterTally {
                             Constants.DEBIT)) {
                         recordAmountEUR = record.getAmount().add(
                                 recordAmountEUR);
-                        // system.out.println("recordAmountEUR: ["+ recordAmountEUR + "]");
 
                     }
                     if (record.getCurrency().getCode().equals(
@@ -206,7 +190,6 @@ public class ConfirmationLetterTally {
                             Constants.DEBIT)) {
                         recordAmountUSD = record.getAmount().add(
                                 recordAmountUSD);
-                        // system.out.println("recordAmountUSD: ["+ recordAmountUSD + "]");
                     }
                 }
                 retrievedAmounts.put(Constants.CURRENCY_EURO, recordAmountEUR);
@@ -218,28 +201,20 @@ public class ConfirmationLetterTally {
         else {
 
             for (Record record : records) {
-//                logger.debug("COUNTERTRANSFER ["+record.getIsCounterTransferRecord()+"] FEERECORD ["+record.getFeeRecord()+"]");
                 if (record.getIsCounterTransferRecord().compareTo(new Integer(0)) == 0
                         && record.getFeeRecord().compareTo(new Integer(0)) == 0) {
                     if ((record.getCurrency().getCode().equals(
                             Constants.FL_CURRENCY_CODE) || record
                             .getCurrency().getCode().equals(
                                     Constants.FL_CURRENCY_CODE_FOR_WEIRD_BANK))) {
-//						System.out.println("record to string: ["+record.toString()+"]");
                         if (record.getSign().equalsIgnoreCase(Constants.DEBIT)) {
-//							 System.out.println("record.getamount DEBIT = ["+ record.getAmount() + "]");
-                            // system.out.println("recordAmountDebitFL 1 = "+ recordAmountDebitFL);
                             recordAmountDebitFL = record.getAmount().add(
                                     recordAmountDebitFL);
-//							System.out.println("recordAmountDebitFL: ["+recordAmountDebitFL+"]");
                         }
                         if (record.getSign().equalsIgnoreCase(Constants.CREDIT)) {
-//							 System.out.println("record.getamount CREDIT = ["+record.getAmount()+"]");
-                            // system.out.println("recordAmountCreditFL 1 = ["+recordAmountCreditFL+"]");
 
                             recordAmountCreditFL = record.getAmount().add(
                                     recordAmountCreditFL);
-//							System.out.println("recordAmountCreditFL: ["+recordAmountCreditFL+"]");
                         }
 
                         if (record.getCurrency().getCode().equals(
@@ -249,13 +224,11 @@ public class ConfirmationLetterTally {
                                     Constants.DEBIT)) {
                                 recordAmountDebitEUR = record.getAmount().add(
                                         recordAmountDebitEUR);
-                                // system.out.println("recordAmountDebitEUR: ["+recordAmountDebitEUR+"]");
                             }
                             if (record.getSign().equalsIgnoreCase(
                                     Constants.CREDIT)) {
                                 recordAmountCreditEUR = record.getAmount().add(
                                         recordAmountCreditEUR);
-                                // system.out.println("recordAmountCreditEUR: ["+recordAmountCreditEUR+"]");
                             }
 
                         }
@@ -269,12 +242,10 @@ public class ConfirmationLetterTally {
                     if (record.getSign().equalsIgnoreCase(Constants.DEBIT)) {
                         recordAmountDebitUSD = record.getAmount().add(
                                 recordAmountDebitUSD);
-                        // system.out.println("recordAmountDebitUSD: ["+recordAmountDebitUSD+"]");
                     }
                     if (record.getSign().equalsIgnoreCase(Constants.CREDIT)) {
                         recordAmountCreditUSD = record.getAmount().add(
                                 recordAmountCreditUSD);
-                        // system.out.println("recordAmountCreditUSD: ["+recordAmountCreditUSD+"]");
                     }
 
                 }
@@ -282,7 +253,6 @@ public class ConfirmationLetterTally {
             }
             // Sansduplicate
             for (TempRecord sansDupRec : sansDuplicateFaultRecordsList) {
-                // logger.debug("sansDupRec: "+sansDupRec);
                 Integer currencyCode = sansDupRec.getCurrencyCode();
                 if (sansDupRec.getSign() == null) {
                     String sign = client.getCreditDebit();
@@ -335,11 +305,8 @@ public class ConfirmationLetterTally {
 
             Map<String, BigDecimal> retrievedAccountNumberAmounts = calculateAmountsFaultyAccountNumber(
                     faultyAccountNumberRecordList, client);
-            // logger.info("Before total debit FL");
-            // logger.info("amountSansDebitFL "+amountSansDebitFL);
             if (retrievedAccountNumberAmounts.get("FaultyAccDebitFL") != null
                     && amountSansDebitFL != null) {
-                // logger.info("retrievedAccountNumberAmounts.get(FaultyAccDebitFL) "+retrievedAccountNumberAmounts.get("FaultyAccDebitFL"));
                 totalDebitFL = recordAmountDebitFL.add(amountSansDebitFL)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -349,11 +316,11 @@ public class ConfirmationLetterTally {
             } else {
                 totalDebitFL = recordAmountDebitFL;
             }
-            // logger.info("totalDebitFL "+totalDebitFL);
+
 
             if (retrievedAccountNumberAmounts.get("FaultyAccCreditFL") != null
                     && amountSansCreditFL != null) {
-                // logger.debug("retrievedAccountNumberAmounts.get(FaultyAccCreditFL):"+retrievedAccountNumberAmounts.get("FaultyAccCreditFL"));
+
                 totalCreditFL = recordAmountCreditFL.add(amountSansCreditFL)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -363,11 +330,12 @@ public class ConfirmationLetterTally {
             } else {
                 totalCreditFL = recordAmountCreditFL;
             }
-            // logger.info("totalCreditFL: "+totalCreditFL);
+
 
             if (retrievedAccountNumberAmounts.get("FaultyAccDebitUSD") != null
                     && amountSansDebitUSD != null) {
-                // logger.info("retrievedAccountNumberAmounts.get(FaultyAccDebitUSD) "+retrievedAccountNumberAmounts.get("FaultyAccDebitUSD"));
+
+
                 totalDebitUSD = recordAmountDebitUSD.add(amountSansDebitUSD)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -377,11 +345,12 @@ public class ConfirmationLetterTally {
             } else {
                 totalDebitUSD = recordAmountDebitUSD;
             }
-            // logger.info("totalDebitUSD "+totalDebitUSD);
+
 
             if (retrievedAccountNumberAmounts.get("FaultyAccCreditUSD") != null
                     && amountSansCreditUSD != null) {
-                // logger.debug("retrievedAccountNumberAmounts.get(FaultyAccCreditUSD):"+retrievedAccountNumberAmounts.get("FaultyAccCreditUSD"));
+
+
                 totalCreditUSD = recordAmountCreditUSD.add(amountSansCreditUSD)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -391,11 +360,11 @@ public class ConfirmationLetterTally {
             } else {
                 totalCreditUSD = recordAmountCreditUSD;
             }
-            // logger.info("totalCreditUSD: "+totalCreditUSD);
 
             if (retrievedAccountNumberAmounts.get("FaultyAccDebitEUR") != null
                     && amountSansDebitEUR != null) {
-                // logger.info("retrievedAccountNumberAmounts.get(FaultyAccDebitEUR) "+retrievedAccountNumberAmounts.get("FaultyAccDebitEUR"));
+
+
                 totalDebitEUR = recordAmountDebitEUR.add(amountSansDebitEUR)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -405,11 +374,13 @@ public class ConfirmationLetterTally {
             } else {
                 totalDebitEUR = recordAmountDebitEUR;
             }
-            // logger.info("totalDebitEUR "+totalDebitEUR);
+
+
 
             if (retrievedAccountNumberAmounts.get("FaultyAccCreditEUR") != null
                     && amountSansCreditEUR != null) {
-                // logger.debug("retrievedAccountNumberAmounts.get(FaultyAccCreditEUR):"+retrievedAccountNumberAmounts.get("FaultyAccCreditEUR"));
+
+
                 totalCreditEUR = recordAmountCreditEUR.add(amountSansCreditEUR)
                         .subtract(
                                 retrievedAccountNumberAmounts
@@ -419,7 +390,8 @@ public class ConfirmationLetterTally {
             } else {
                 totalCreditEUR = recordAmountCreditEUR;
             }
-            // logger.info("totalCreditEUR: "+totalCreditEUR);
+
+
 
             recordAmountFL = totalDebitFL.subtract(totalCreditFL).abs();
             recordAmountUSD = totalDebitUSD.subtract(totalCreditUSD).abs();
@@ -487,7 +459,7 @@ public class ConfirmationLetterTally {
                     Boolean newList = true;
                     if (list.size() == 0
                             && record.getSign().equalsIgnoreCase(type)) {
-                        // logger.info("bank gegevens: "+record.getSign()+" : "+record.getBank().getName()+" : "+record.getBeneficiaryName());
+
                         AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
                         aARPB.setBankName(record.getBank().getName());
                         aARPB.setTotalRecord(1);
@@ -500,7 +472,7 @@ public class ConfirmationLetterTally {
                         newList = false;
                     }
                     if (newList && record.getSign().equalsIgnoreCase(type)) {
-                        // logger.info("bank gegevens: "+record.getSign()+" : "+record.getBank().getName()+" : "+record.getBeneficiaryName());
+
                         Boolean newRecord = true;
                         for (AmountAndRecordsPerBank object : list) {
                             if (object.getBankName().equalsIgnoreCase(
@@ -516,17 +488,6 @@ public class ConfirmationLetterTally {
                                 newRecord = false;
                             }
                         }
-//                        if (newRecord) {
-//                            AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
-//                            aARPB.setBankName(record.getBank().getName());
-//                            aARPB.setTotalRecord(1);
-//                            aARPB.setAmount(record.getAmount());
-//                            aARPB.setCurrencyType(record.getCurrency()
-//                                    .getCurrencyType());
-//                            aARPB.setAccountNumber(record
-//                                    .getBeneficiaryAccountNumber());
-//                            list.add(aARPB);
-//                        }
                     }
                 }
             }
@@ -551,7 +512,7 @@ public class ConfirmationLetterTally {
                         newList = false;
                     }
                     if (newList && record.getSign().equalsIgnoreCase(type)) {
-                        // logger.info("bank gegevens: "+record.getSign()+" : "+record.getBank().getName()+" : "+record.getBeneficiaryName());
+
                         Boolean newRecord = true;
                         for (AmountAndRecordsPerBank object : list) {
                             if (object.getBankName().equalsIgnoreCase(
@@ -567,17 +528,6 @@ public class ConfirmationLetterTally {
                                 newRecord = false;
                             }
                         }
-//                        if (newRecord) {
-//                            AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
-//                            aARPB.setBankName(record.getBank().getName());
-//                            aARPB.setTotalRecord(1);
-//                            aARPB.setAmount(record.getAmount());
-//                            aARPB.setCurrencyType(record.getCurrency()
-//                                    .getCurrencyType());
-//                            aARPB.setAccountNumber(record
-//                                    .getBeneficiaryAccountNumber());
-//                            list.add(aARPB);
-//                        }
                     }
                 }
             }
